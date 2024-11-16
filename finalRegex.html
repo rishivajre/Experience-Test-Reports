@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regex Tester & Validator</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            background: #e8f5e9;
+            min-height: 100vh;
+            display: block;
+            /* Changed from flex to block */
+        }
+
+        .container {
+            background: #e8f5e9;
+            box-shadow: 10px 10px 20px #c1d8c6, -10px -10px 20px #ffffff;
+            border-radius: 12px;
+            padding: 30px;
+            width: 100%;
+            max-width: 980px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 1.5em;
+            color: #242424;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 1em;
+            color: #292626;
+            margin-top: 80px;
+            margin-bottom: 14px;
+        }
+
+        p {
+            font-size: 0.8em;
+            color: #363535;
+            margin-bottom: 14px;
+        }
+
+        .input-label {
+            font-size: 1em;
+            color: #388e3c;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .input-field {
+            background: #e8f5e9;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            margin-bottom: 15px;
+            box-shadow: inset 5px 5px 10px #c1d8c6, inset -5px -5px 10px #ffffff;
+            border-radius: 8px;
+            font-size: 1em;
+            color: #2e7d32;
+        }
+
+        .button {
+            background: #e8f5e9;
+            border: none;
+            padding: 10px 20px;
+            margin-top: 10px;
+            box-shadow: 5px 5px 10px #c1d8c6, -5px -5px 10px #ffffff;
+            border-radius: 8px;
+            font-size: 1em;
+            color: #2e7d32;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+
+        .button:hover {
+            box-shadow: inset 5px 5px 10px #c1d8c6, inset -5px -5px 10px #ffffff;
+        }
+
+        .output {
+            background: #e8f5e9;
+            padding: 10px;
+            margin-top: 15px;
+            box-shadow: inset 5px 5px 10px #c1d8c6, inset -5px -5px 10px #ffffff;
+            border-radius: 8px;
+            color: #2e7d32;
+            font-size: 0.9em;
+            white-space: pre-wrap;
+            text-align: left;
+        }
+
+        .highlight {
+            background-color: #a5d6a7;
+            font-weight: bold;
+        }
+
+        /* Responsive Design */
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                width: 100%;
+            }
+            h1 {
+                font-size: 1.25em;
+            }
+            .input-field {
+                font-size: 0.9em;
+                padding: 8px;
+            }
+            .button {
+                font-size: 0.9em;
+                padding: 8px 16px;
+            }
+            .output {
+                font-size: 0.85em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.1em;
+            }
+            .input-field {
+                font-size: 0.85em;
+                padding: 7px;
+            }
+            .button {
+                font-size: 0.85em;
+                padding: 7px 14px;
+            }
+            .output {
+                font-size: 0.8em;
+            }
+        }
+
+        .regex-ref-container {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            padding: 1rem;
+            background-color: #f5f7fa;
+            width: 100%;
+            max-width: 100vw;
+        }
+
+        .regex-ref-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .regex-ref-header {
+            background-color: #e2e8f0;
+            padding: 1rem;
+            font-weight: bold;
+            color: #2d3748;
+            border-bottom: 2px solid #cbd5e0;
+        }
+
+        .regex-ref-table-wrapper {
+            overflow-x: auto;
+            padding: 0.5rem;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .regex-ref-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0.5rem 0;
+            background-color: white;
+            font-size: 0.95rem;
+        }
+
+        .regex-ref-table th,
+        .regex-ref-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .regex-ref-table th {
+            background-color: #f8fafc;
+            font-weight: 600;
+            color: #2d3748;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .regex-ref-table tr:hover {
+            background-color: #f7fafc;
+        }
+
+        .regex-pattern {
+            font-family: 'Fira Code', monospace;
+            background-color: #f1f5f9;
+            padding: 0.5rem;
+            border-radius: 4px;
+            display: inline-block;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            word-break: break-all;
+            font-size: 0.85rem;
+        }
+
+        .regex-pattern:hover {
+            background-color: #e2e8f0;
+        }
+
+        .regex-ref-copy-notice {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #48bb78;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            display: none;
+            animation: regexRefFadeInOut 2s ease-in-out;
+            z-index: 1000;
+            font-size: 0.9rem;
+        }
+
+        .regex-ref-category {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            margin-right: 0.5rem;
+            font-weight: normal;
+        }
+
+        .regex-ref-general {
+            background-color: #bfdbfe;
+        }
+
+        .regex-ref-cucumber {
+            background-color: #bbf7d0;
+        }
+
+        .regex-ref-selenium {
+            background-color: #fde68a;
+        }
+
+        .regex-ref-testng {
+            background-color: #ddd6fe;
+        }
+
+        .regex-ref-api {
+            background-color: #fed7aa;
+        }
+
+        @keyframes regexRefFadeInOut {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            10% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            90% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+        }
+
+        .regex-ref-filters {
+            padding: 1rem;
+            background-color: #f8fafc;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .regex-ref-filter-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background-color: white;
+            font-size: 0.9rem;
+        }
+
+        .regex-ref-filter-btn.active {
+            background-color: #2d3748;
+            color: white;
+            border-color: #2d3748;
+        }
+
+        @media (max-width: 768px) {
+            .regex-ref-container {
+                padding: 0.5rem;
+            }
+            .regex-ref-table th,
+            .regex-ref-table td {
+                padding: 0.5rem;
+                font-size: 0.85rem;
+            }
+            .regex-pattern {
+                font-size: 0.75rem;
+                padding: 0.25rem;
+            }
+            .regex-ref-category {
+                font-size: 0.7rem;
+                padding: 0.2rem 0.4rem;
+            }
+            .regex-ref-filter-btn {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.8rem;
+            }
+            .regex-ref-table-wrapper {
+                margin: 0 -0.5rem;
+                padding: 0.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .regex-ref-table {
+                font-size: 0.8rem;
+            }
+            .regex-ref-filters {
+                padding: 0.5rem;
+            }
+            .regex-pattern {
+                font-size: 0.7rem;
+            }
+        }
+
+        .section-1 {
+            display: flex;
+            justify-content: center;
+            min-height: 30vh;
+        }
+
+        .section-2 {
+            background-color: #f5f7fa;
+        }
+    </style>
+</head>
+
+<body>
+    <section class="section-1">
+        <div class="container">
+            <h1>Regex Tester & Validator</h1>
+            <label class="input-label" for="regex-input">Enter Regex:</label>
+            <input type="text" id="regex-input" class="input-field" placeholder="e.g., ^[a-zA-Z0-9]+$">
+
+            <label class="input-label" for="test-input">Enter Test String:</label>
+            <textarea id="test-input" class="input-field" rows="8" placeholder="Enter your text here..."></textarea>
+
+            <button class="button" onclick="testRegex()">Test Regex</button>
+            <div class="output" id="output" style="display: none;"></div>
+        </div>
+
+        <script>
+            function testRegex() {
+                const regexInput = document.getElementById('regex-input').value;
+                const testInput = document.getElementById('test-input').value;
+                const outputDiv = document.getElementById('output');
+
+                if (!regexInput || !testInput) {
+                    alert('Please fill in both fields.');
+                    return;
+                }
+
+                try {
+                    const regex = new RegExp(regexInput, 'g');
+                    const matches = [...testInput.matchAll(regex)];
+
+                    if (matches.length) {
+                        const highlightedText = testInput.replace(regex, match => `<span class="highlight">${match}</span>`);
+                        outputDiv.innerHTML = `Matches Found:\n${highlightedText}`;
+                    } else {
+                        outputDiv.textContent = 'No matches found.';
+                    }
+
+                    outputDiv.style.display = 'block';
+                } catch (e) {
+                    outputDiv.textContent = `Invalid Regex: ${e.message}`;
+                    outputDiv.style.display = 'block';
+                }
+            }
+        </script>
+    </section>
+    <div class="section-header">
+        <h2>Summary</h2>
+        <p>A Regex Tester & Validator is a valuable tool for testers, developers, and anyone working with data validation, pattern matching, or text processing.</p>
+    </div>
+
+    <section class="section-2">
+        <div class="regex-ref-container">
+            <div class="regex-ref-inner">
+                <div class="regex-ref-filters">
+                    <button class="regex-ref-filter-btn active" data-category="all">All</button>
+                    <button class="regex-ref-filter-btn" data-category="general">General</button>
+                    <button class="regex-ref-filter-btn" data-category="cucumber">Cucumber</button>
+                    <button class="regex-ref-filter-btn" data-category="selenium">Selenium</button>
+                    <button class="regex-ref-filter-btn" data-category="testng">TestNG</button>
+                    <button class="regex-ref-filter-btn" data-category="api">API Testing</button>
+                </div>
+                <div class="regex-ref-table-wrapper">
+                    <table class="regex-ref-table">
+                        <thead>
+                            <tr>
+                                <th>Use Case</th>
+                                <th>Regex Pattern</th>
+                                <th>Explanation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- General Patterns -->
+                            <tr data-category="general">
+                                <td><span class="regex-ref-category regex-ref-general">General</span>Validate Email</td>
+                                <td><code class="regex-pattern">^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$</code></td>
+                                <td>Validates email format (e.g., user@example.com)</td>
+                            </tr>
+                            <tr data-category="general">
+                                <td><span class="regex-ref-category regex-ref-general">General</span>Phone Number (US)</td>
+                                <td><code class="regex-pattern">\d{3}-\d{3}-\d{4}</code></td>
+                                <td>Matches phone numbers in XXX-XXX-XXXX format</td>
+                            </tr>
+
+                            <!-- Cucumber Patterns -->
+                            <tr data-category="cucumber">
+                                <td><span class="regex-ref-category regex-ref-cucumber">Cucumber</span>Scenario Outline</td>
+                                <td><code class="regex-pattern">^Scenario Outline: (.*)$</code></td>
+                                <td>Matches Cucumber scenario outline declarations</td>
+                            </tr>
+                            <tr data-category="cucumber">
+                                <td><span class="regex-ref-category regex-ref-cucumber">Cucumber</span>Given Step</td>
+                                <td><code class="regex-pattern">^Given (?:|I )(.+)$</code></td>
+                                <td>Matches Cucumber Given steps with optional "I" subject</td>
+                            </tr>
+                            <tr data-category="cucumber">
+                                <td><span class="regex-ref-category regex-ref-cucumber">Cucumber</span>Then Step with Table</td>
+                                <td><code class="regex-pattern">^Then (?:|I )should see table:$</code></td>
+                                <td>Matches Cucumber Then steps expecting a data table</td>
+                            </tr>
+
+                            <!-- Selenium Patterns -->
+                            <tr data-category="selenium">
+                                <td><span class="regex-ref-category regex-ref-selenium">Selenium</span>Dynamic ID Elements</td>
+                                <td><code class="regex-pattern">//*[contains(@id, 'dynamic-')]</code></td>
+                                <td>Locates elements with dynamic IDs containing 'dynamic-'</td>
+                            </tr>
+                            <tr data-category="selenium">
+                                <td><span class="regex-ref-category regex-ref-selenium">Selenium</span>Data-Test Attributes</td>
+                                <td><code class="regex-pattern">//[data-test-id='([^']*?)']</code></td>
+                                <td>Matches elements with data-test-id attributes</td>
+                            </tr>
+                            <tr data-category="selenium">
+                                <td><span class="regex-ref-category regex-ref-selenium">Selenium</span>Angular Dynamic Elements</td>
+                                <td><code class="regex-pattern">//*[@ng-repeat='item in items']</code></td>
+                                <td>Locates Angular repeated elements</td>
+                            </tr>
+
+                            <!-- TestNG Patterns -->
+                            <tr data-category="testng">
+                                <td><span class="regex-ref-category regex-ref-testng">TestNG</span>Test Method Pattern</td>
+                                <td><code class="regex-pattern">@Test\s*(\(.*\))?\s*public\s+void\s+\w+\s*\([^)]*\)</code></td>
+                                <td>Matches TestNG test method declarations</td>
+                            </tr>
+                            <tr data-category="testng">
+                                <td><span class="regex-ref-category regex-ref-testng">TestNG</span>Data Provider</td>
+                                <td><code class="regex-pattern">@DataProvider\s*\(\s*name\s*=\s*"([^"]+)"\s*\)</code></td>
+                                <td>Matches TestNG data provider declarations</td>
+                            </tr>
+
+                            <!-- API Testing Patterns -->
+                            <tr data-category="api">
+                                <td><span class="regex-ref-category regex-ref-api">API</span>JWT Token</td>
+                                <td><code class="regex-pattern">^[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*$</code></td>
+                                <td>Validates JWT token format</td>
+                            </tr>
+                            <tr data-category="api">
+                                <td><span class="regex-ref-category regex-ref-api">API</span>Bearer Token Header</td>
+                                <td><code class="regex-pattern">^Bearer\s+[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*$</code></td>
+                                <td>Matches Authorization header with Bearer token</td>
+                            </tr>
+                            <tr data-category="api">
+                                <td><span class="regex-ref-category regex-ref-api">API</span>REST API Endpoint</td>
+                                <td><code class="regex-pattern">^/api/v\d+/[\w-]+(?:/[\w-]+)*$</code></td>
+                                <td>Matches RESTful API endpoints with versioning</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="regex-ref-copy-notice">Pattern copied to clipboard!</div>
+
+        <script>
+            // Copy functionality
+            document.querySelectorAll('.regex-pattern').forEach(pattern => {
+                pattern.addEventListener('click', async () => {
+                    try {
+                        await navigator.clipboard.writeText(pattern.textContent);
+                        const notice = document.querySelector('.regex-ref-copy-notice');
+                        notice.style.display = 'block';
+                        setTimeout(() => {
+                            notice.style.display = 'none';
+                        }, 2000);
+                    } catch (err) {
+                        console.error('Failed to copy text: ', err);
+                    }
+                });
+            });
+
+            // Filter functionality
+            document.querySelectorAll('.regex-ref-filter-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    // Update active state of buttons
+                    document.querySelectorAll('.regex-ref-filter-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    button.classList.add('active');
+
+                    const category = button.dataset.category;
+                    const rows = document.querySelectorAll('.regex-ref-table tbody tr');
+
+                    rows.forEach(row => {
+                        if (category === 'all' || row.dataset.category === category) {
+                            row.style.display = '';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
+                });
+            });
+        </script>
+    </section>
+
+</body>
+
+</html>

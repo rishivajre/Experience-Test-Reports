@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium REGEX Generator</title>
+    <style>
+        :root {
+            --gradient-start: #f6f8fc;
+            --gradient-end: #e9edf5;
+            --primary: #edf0f7;
+            --shadow-dark: #c8d0e7;
+            --shadow-light: #ffffff;
+            --accent: #6d5dfc;
+            --accent-hover: #5b4ceb;
+            --text-primary: #2d3748;
+            --text-secondary: #4a5568;
+            --success: #4ade80;
+            --error: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f6f8fc 0%, #e9edf5 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        .regex-app {
+            max-width: 1000px;
+            width: 100%;
+            margin: 2rem auto;
+            padding: 2.5rem;
+            background: linear-gradient(145deg, var(--gradient-start), var(--gradient-end));
+            border-radius: 30px;
+            box-shadow: 5px 5px 4px #e8dbff, -5px -5px 4px #e8dbff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .regex-app::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-hover));
+        }
+
+        .regex-app h1 {
+            color: var(--text-primary);
+            text-align: center;
+            margin-bottom: 2.5rem;
+            font-size: 2.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--text-primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 0.5rem;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            background: var(--primary);
+            box-shadow: 5px 5px 10px var(--shadow-dark),
+                       -5px -5px 10px var(--shadow-light);
+            transition: all 0.3s ease;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .neumorphic-input {
+            width: 100%;
+            padding: 1.2rem;
+            border: none;
+            border-radius: 15px;
+            background: var(--primary);
+            box-shadow: inset 5px 5px 10px var(--shadow-dark),
+                       inset -5px -5px 10px var(--shadow-light);
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .neumorphic-input:focus {
+            outline: none;
+            box-shadow: inset 7px 7px 14px var(--shadow-dark),
+                       inset -7px -7px 14px var(--shadow-light);
+        }
+
+        .regex-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        .neumorphic-button {
+            padding: 1rem 1.5rem;
+            border: none;
+            border-radius: 12px;
+            background: var(--primary);
+            box-shadow: 5px 5px 10px var(--shadow-dark),
+                       -5px -5px 10px var(--shadow-light);
+            color: var(--text-primary);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .neumorphic-button::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transform: translateX(-100%);
+        }
+
+        .neumorphic-button:hover::after {
+            transform: translateX(100%);
+            transition: transform 0.6s ease;
+        }
+
+        .neumorphic-button:hover {
+            box-shadow: 7px 7px 14px var(--shadow-dark),
+                       -7px -7px 14px var(--shadow-light);
+            transform: translateY(-2px);
+            color: var(--accent);
+        }
+
+        .neumorphic-button:active {
+            box-shadow: inset 5px 5px 10px var(--shadow-dark),
+                       inset -5px -5px 10px var(--shadow-light);
+            transform: translateY(0);
+        }
+
+        .result-container {
+            padding: 2rem;
+            border-radius: 20px;
+            background: var(--primary);
+            box-shadow: inset 5px 5px 10px var(--shadow-dark),
+                       inset -5px -5px 10px var(--shadow-light);
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .copy-button {
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            cursor: pointer;
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .copy-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(109, 93, 252, 0.4);
+        }
+
+        .test-area {
+            margin-top: 2rem;
+            padding: 2rem;
+            border-radius: 20px;
+            background: var(--primary);
+            box-shadow: inset 5px 5px 10px var(--shadow-dark),
+                       inset -5px -5px 10px var(--shadow-light);
+        }
+
+        .matches {
+            background: var(--success);
+            color: white;
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            display: inline-block;
+            margin: 0.2rem;
+            font-weight: 500;
+        }
+
+        .feature-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: linear-gradient(135deg, var(--warning), var(--accent));
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .history-panel {
+            max-height: 150px;
+            overflow-y: auto;
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 12px;
+            background: var(--primary);
+            box-shadow: inset 3px 3px 6px var(--shadow-dark),
+                       inset -3px -3px 6px var(--shadow-light);
+        }
+
+        .history-item {
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .history-item:hover {
+            background: rgba(109, 93, 252, 0.1);
+        }
+
+        .tooltip {
+            position: absolute;
+            background: var(--accent);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+        }
+
+        /* Mobile Responsive Styles */
+@media screen and (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    .regex-app {
+        margin: 0.5rem;
+        padding: 1.2rem;
+        border-radius: 20px;
+    }
+
+    .regex-app h1 {
+        font-size: 1.8rem;
+        margin-bottom: 1.5rem;
+        padding-top: 1rem;
+    }
+
+    .feature-badge {
+        font-size: 0.7rem;
+        padding: 0.3rem 0.6rem;
+    }
+
+    .theme-toggle {
+        top: 15px;
+        right: 15px;
+        width: 35px;
+        height: 35px;
+    }
+
+    .input-group {
+        margin-bottom: 1rem;
+    }
+
+    .neumorphic-input {
+        padding: 0.8rem;
+        font-size: 1rem;
+        border-radius: 12px;
+    }
+
+    .regex-buttons {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.8rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .neumorphic-button {
+        padding: 0.8rem 1rem;
+        font-size: 0.9rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        touch-action: manipulation;
+    }
+
+    .result-container {
+        padding: 1.2rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .copy-button {
+        position: static;
+        width: 100%;
+        margin-top: 0.5rem;
+        margin-bottom: 1rem;
+        padding: 0.7rem;
+        font-size: 0.9rem;
+    }
+
+    .test-area {
+        padding: 1.2rem;
+        margin-top: 1.5rem;
+    }
+
+    .matches {
+        padding: 0.2rem 0.4rem;
+        font-size: 0.9rem;
+        margin: 0.1rem;
+    }
+
+    .history-panel {
+        max-height: 120px;
+        padding: 0.8rem;
+    }
+
+    .history-item {
+        padding: 0.4rem;
+        margin-bottom: 0.4rem;
+        font-size: 0.9rem;
+    }
+
+    /* Touch-friendly improvements */
+    .neumorphic-button:hover {
+        transform: none;
+    }
+
+    .neumorphic-button:active {
+        transform: scale(0.98);
+        transition: transform 0.1s;
+    }
+
+    /* Improved touch targets */
+    .history-item {
+        min-height: 44px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    /* Prevent zoom on input focus for iOS */
+    @media screen and (-webkit-min-device-pixel-ratio: 0) { 
+        select,
+        textarea,
+        input {
+            font-size: 16px !important;
+        }
+    }
+
+    /* Improved scrolling */
+    .history-panel {
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+    }
+
+    /* Adjusted text sizes for better readability */
+    #regexResult {
+        font-size: 0.9rem;
+        word-break: break-all;
+    }
+
+    #testResult {
+        font-size: 0.9rem;
+    }
+
+    #patternExplanation {
+        font-size: 0.85rem;
+        margin-top: 0.8rem;
+    }
+
+    /* Better spacing for small screens */
+    .regex-app > * + * {
+        margin-top: 1rem;
+    }
+
+    /* Improved tooltip positioning for mobile */
+    .tooltip {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1000;
+        width: 90%;
+        max-width: 300px;
+        text-align: center;
+        font-size: 0.9rem;
+        padding: 0.8rem;
+    }
+}
+
+/* Extra small devices */
+@media screen and (max-width: 375px) {
+    .regex-app h1 {
+        font-size: 1.5rem;
+    }
+
+    .regex-buttons {
+        grid-template-columns: 1fr;
+    }
+
+    .neumorphic-button {
+        padding: 0.7rem;
+        font-size: 0.85rem;
+    }
+}
+
+/* Landscape orientation adjustments */
+@media screen and (max-width: 900px) and (orientation: landscape) {
+    body {
+        padding: 5px;
+    }
+
+    .regex-app {
+        margin: 0.3rem;
+        padding: 1rem;
+    }
+
+    .regex-buttons {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.5rem;
+    }
+
+    .history-panel {
+        max-height: 80px;
+    }
+
+    .regex-app h1 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+}
+
+/* Medium-sized tablets */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+    .regex-app {
+        margin: 1rem;
+        padding: 1.5rem;
+    }
+
+    .regex-buttons {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* Improved touch feedback for all touch devices */
+@media (hover: none) {
+    .neumorphic-button:hover {
+        transform: none;
+        box-shadow: 5px 5px 10px var(--shadow-dark),
+                   -5px -5px 10px var(--shadow-light);
+    }
+
+    .copy-button:hover {
+        transform: none;
+    }
+
+    .history-item:hover {
+        background: transparent;
+    }
+
+    .neumorphic-input:focus {
+        box-shadow: inset 5px 5px 10px var(--shadow-dark),
+                   inset -5px -5px 10px var(--shadow-light);
+    }
+}
+    </style>
+</head>
+<body>
+    <div class="regex-app">
+        <span class="feature-badge">Premium</span>
+        <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
+        <h1>REGEX Generator</h1>
+        
+        <div class="input-group">
+            <input type="text" class="neumorphic-input" id="regexInput" placeholder="Enter your regular expression" />
+        </div>
+
+        <div class="regex-buttons">
+            <button class="neumorphic-button" onclick="addPattern('\\d+')">Numbers</button>
+            <button class="neumorphic-button" onclick="addPattern('[A-Za-z]+')">Letters</button>
+            <button class="neumorphic-button" onclick="addPattern('\\w+')">Word</button>
+            <button class="neumorphic-button" onclick="addPattern('\\s+')">Whitespace</button>
+            <button class="neumorphic-button" onclick="addPattern('[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}')">Email</button>
+            <button class="neumorphic-button" onclick="addPattern('(https?:\\/\\/)?[\\w\\-]+(\\.[\\w\\-]+)+[\\w\\-\\.,@?^=%&:/~\\+#]*')">URL</button>
+            <button class="neumorphic-button" onclick="addPattern('^\\+?[1-9]\\d{1,14}$')">Phone</button>
+            <button class="neumorphic-button" onclick="addPattern('^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$')">Password</button>
+        </div>
+
+        <div class="result-container">
+            <button class="copy-button" onclick="copyToClipboard()">Copy Pattern</button>
+            <p id="regexResult">Your regex pattern will appear here</p>
+            <div id="patternExplanation" style="margin-top: 1rem; color: var(--text-secondary);"></div>
+        </div>
+
+        <div class="test-area">
+            <div class="input-group">
+                <input type="text" class="neumorphic-input" id="testInput" placeholder="Test your regex pattern here" />
+            </div>
+            <p id="testResult"></p>
+        </div>
+
+        <h3 style="margin-top: 2rem; color: var(--text-primary);">Recent Patterns</h3>
+        <div class="history-panel" id="historyPanel"></div>
+    </div>
+
+    <script>
+        const regexInput = document.getElementById('regexInput');
+        const testInput = document.getElementById('testInput');
+        const regexResult = document.getElementById('regexResult');
+        const testResult = document.getElementById('testResult');
+        const historyPanel = document.getElementById('historyPanel');
+        const patternExplanation = document.getElementById('patternExplanation');
+
+        let patternHistory = JSON.parse(localStorage.getItem('regexHistory') || '[]');
+
+        function addPattern(pattern) {
+            regexInput.value = pattern;
+            updateResults();
+        }
+
+        function showTooltip(message) {
+            const tooltip = document.createElement('div');
+            tooltip.className = 'tooltip';
+            tooltip.textContent = message;
+            document.body.appendChild(tooltip);
+
+            const rect = event.target.getBoundingClientRect();
+            tooltip.style.top = `${rect.top - 40}px`;
+            tooltip.style.left = `${rect.left + (rect.width - tooltip.offsetWidth) / 2}px`;
+            tooltip.style.opacity = '1';
+
+            setTimeout(() => {
+                tooltip.style.opacity = '0';
+                setTimeout(() => tooltip.remove(), 300);
+            }, 300);
+        }
+
+        function copyToClipboard() {
+            navigator.clipboard.writeText(regexInput.value).then(() => {
+                const button = document.querySelector('.copy-button');
+                button.textContent = 'Copied!';
+                setTimeout(() => {
+                    button.textContent = 'Copy Pattern';
+                }, 1500);
+            });
+        }
+
+        function explainPattern(pattern) {
+            const explanations = {
+                '\\d+': 'Matches one or more digits',
+                '[A-Za-z]+': 'Matches one or more letters',
+                '\\w+': 'Matches one or more word characters (letters, digits, or underscores)',
+                '\\s+': 'Matches one or more whitespace characters',
+                '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}': 'Matches email addresses',
+                '(https?:\\/\\/)?[\\w\\-]+(\\.[\\w\\-]+)+[\\w\\-\\.,@?^=%&:/~\\+#]*': 'Matches URLs',
+                '^\\+?[1-9]\\d{1,14}$': 'Matches international phone numbers',
+                '^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$': 'Matches passwords (minimum 8 characters, at least one letter and one number)'
+            };
+
+            return explanations[pattern] || 'Custom pattern';
+        }
+
+        function updateHistory() {
+            const pattern = regexInput.value;
+            if (pattern && !patternHistory.includes(pattern)) {
+                patternHistory.unshift(pattern);
+                if (patternHistory.length > 5) patternHistory.pop();
+                localStorage.setItem('regexHistory', JSON.stringify(patternHistory));
+                renderHistory();
+            }
+        }
+
+        function renderHistory() {
+            historyPanel.innerHTML = patternHistory
+                .map(pattern => `
+                    <div class="history-item" onclick="addPattern('${pattern}')">
+                        <div style="font-weight: 600;">${pattern}</div>
+                        <div style="font-size: 0.8rem; color: var(--text-secondary);">
+                            ${explainPattern(pattern)}
+                        </div>
+                    </div>
+                `).join('');
+        }
+
+        function updateResults() {
+            if (!regexInput.value) {
+                regexResult.textContent = 'Your regex pattern will appear here';
+                testResult.textContent = '';
+                patternExplanation.textContent = '';
+                return;
+            }
+
+            regexResult.textContent = regexInput.value;
+            patternExplanation.textContent = explainPattern(regexInput.value);
+            updateHistory();
+
+            try {
+                const regex = new RegExp(regexInput.value, 'g');
+                const text = testInput.value;
+                const matches = text.match(regex);
+
+                if (!text) {
+                    testResult.innerHTML = `
+                        <div style="color: var(--text-secondary); padding: 1rem;">
+                            Enter text to test the pattern
+                        </div>
+                    `;
+                    return;
+                }
+
+                if (matches) {
+                    let highlightedText = text;
+                    const uniqueMatches = [...new Set(matches)];
+                    
+                    matches.forEach(match => {
+                        highlightedText = highlightedText.replace(
+                            match, 
+                            `<span class="matches">${match}</span>`
+                        );
+                    });
+
+                    testResult.innerHTML = `
+                        <div style="margin-bottom: 1rem;">
+                            <strong>Found ${matches.length} match${matches.length === 1 ? '' : 'es'}</strong>
+                            ${uniqueMatches.length !== matches.length ? 
+                                `(${uniqueMatches.length} unique)` : ''
+                            }
+                        </div>
+                        <div style="margin-bottom: 1rem;">${highlightedText}</div>
+                        <div style="font-size: 0.9rem; color: var(--text-secondary);">
+                            Match details:
+                            <ul style="margin-top: 0.5rem;">
+                                ${uniqueMatches.map(match => `
+                                    <li>
+                                        "${match}" 
+                                        (${matches.filter(m => m === match).length} occurrence${
+                                            matches.filter(m => m === match).length === 1 ? '' : 's'
+                                        })
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    `;
+                } else {
+                    testResult.innerHTML = `
+                        <div style="color: var(--error); padding: 1rem;">
+                            No matches found
+                        </div>
+                    `;
+                }
+            } catch (e) {
+                testResult.innerHTML = `
+                    <div style="color: var(--error); padding: 1rem;">
+                        Invalid regular expression: ${e.message}
+                    </div>
+                `;
+            }
+        }
+
+        function toggleTheme() {
+            const root = document.documentElement;
+            const isDark = root.style.getPropertyValue('--primary') === '#2d3748';
+            
+            if (isDark) {
+                // Light theme
+                root.style.setProperty('--gradient-start', '#f6f8fc');
+                root.style.setProperty('--gradient-end', '#e9edf5');
+                root.style.setProperty('--primary', '#edf0f7');
+                root.style.setProperty('--shadow-dark', '#c8d0e7');
+                root.style.setProperty('--shadow-light', '#ffffff');
+                root.style.setProperty('--text-primary', '#2d3748');
+                root.style.setProperty('--text-secondary', '#4a5568');
+            } else {
+                // Dark theme
+                root.style.setProperty('--gradient-start', '#1a202c');
+                root.style.setProperty('--gradient-end', '#2d3748');
+                root.style.setProperty('--primary', '#2d3748');
+                root.style.setProperty('--shadow-dark', '#1a202c');
+                root.style.setProperty('--shadow-light', '#4a5568');
+                root.style.setProperty('--text-primary', '#f7fafc');
+                root.style.setProperty('--text-secondary', '#e2e8f0');
+            }
+            
+            document.querySelector('.theme-toggle').textContent = isDark ? '🌓' : '🌙';
+        }
+
+        // Initialize
+        renderHistory();
+        regexInput.addEventListener('input', updateResults);
+        testInput.addEventListener('input', updateResults);
+
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'c' && document.activeElement !== testInput) {
+                e.preventDefault();
+                copyToClipboard();
+            }
+        });
+
+        // Add examples tooltip
+        const buttons = document.querySelectorAll('.neumorphic-button');
+        buttons.forEach(button => {
+            button.addEventListener('mouseover', (e) => {
+                const pattern = button.getAttribute('onclick').match(/'([^']+)'/)[1];
+                const explanation = explainPattern(pattern);
+            });
+        });
+    </script>
+</body>
+</html>
